@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Auth POC</title>
+    <base href="/">
+    <!--  If you are targeting mobile audiences, Auth0 recommends that you add the following meta tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <!--  <div id="loading">
+    <img src="assets/loading.svg" alt="Loading spinner">
+  </div -->>
+    <div class="content">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Auth0 - JavaScript</a>
+                    <button id="btn-home-view" class="btn btn-primary btn-margin">
+                        Home
+                    </button>
+                    <button id="btn-login" class="btn btn-primary btn-margin">
+                        Log In
+                    </button>
+                    <button id="btn-logout" class="btn btn-primary btn-margin">
+                        Log Out
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <main class="container">
+            <!-- home view -->
+            <div id="home-view">
+                <h4></h4>
+            </div>
+        </main>
+        <h2>Welcome <span id="nick" class="nickname"></span></h2>
+    </div>
+    <script src="https://cdn.auth0.com/js/lock/10.19/lock.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script>
+    var options = {
+        theme: {
+            logo: "https://vignette2.wikia.nocookie.net/logopedia/images/0/0b/Fox_News_Channel.svg.png/revision/latest?cb=20121107232621",
+            primaryColor: "#0000FF"
+        },
+        loginAfterSignUp: false,
+        additionalSignUpFields: [{
+                type: "select",
+                name: "party",
+                placeholder: "choose your party",
+                options: [
+                    { value: "republican", label: "Republican" },
+                    { value: "democrat", label: "Democrat" },
+                    { value: "independent", label: "independent" }
+                ]
+                // The following properties are optional
+                // icon: "https://cdn0.iconfinder.com/data/icons/thin-voting-awards/24/thin-0665_vote_ticket_paper_voting-512.png"
+            },
+            {
+                type: "checkbox",
+                name: "permissions",
+                //TO DO: make this linkable to: http://www.foxnews.com/about/privacy-policy/ && http://www.foxnews.com/story/2010/05/10/fox-news-network-llc-terms-use-agreement.html
+                placeholder: "I have read and agree to Fox News Digital's Terms of Service and Privacy Policy"
+            }
+        ]
+        //TO DO: add checkbox newsletter field (need to choose more than one)
+        //TO DO: add username field
+        //TO DO: can I make optional fields (like gender)?
+
+    };
+
+    // Initiating our Auth0Lock
+    var lock = new Auth0Lock(
+        'F6Fg1rAPo4r9pzG6jSfQ2mjlnFArvRi3',
+        'lindahaviv.auth0.com',
+        options
+    );
+
+    // var hash = lock.parseHash(window.location.hash);
+
+    // if(hash){
+    //     if(hash.error){
+    //         console.log('error logging in.');
+    //         return;
+    //     }
+    //     if (hash.id_token){
+    //         lock.getProfile(hash.id_token, function(err,profile){
+    //             if(err){
+    //                 console.log('error fetching profile!', err);
+    //                 return;
+    //             }
+    //             $('#btn-login').hide();
+    //             $('#btn-logout').show();
+    //         });
+    //     }
+    // }
+
+    // Listening for the authenticated event
+    lock.on("authenticated", function(authResult) {
+
+        // Use the token in authResult to getUserInfo() and save it to localStorage
+        lock.getUserInfo(authResult.accessToken, function(error, profile) {
+            if (error) {
+                // Handle error
+                console.log(error);
+                return;
+            } else {
+                console.log(profile);
+            }
+
+            document.getElementById('nick').textContent = profile.nickname;
+
+
+            // Save token and profile locally
+
+            localStorage.setItem('accessToken', authResult.accessToken);
+            localStorage.setItem('profile', JSON.stringify(profile));
+
+
+            // Update DOM
+        });
+    });
+
+    $('#btn-login').click(function(e) {
+        e.preventDefault();
+        lock.show(
+        // {
+        //     callbackURL: 'http://localhost:3000',
+        //     responseType: 'token'
+        // }
+        );
+
+    });
+
+    $('#btn-logout').click(function(e) {
+        e.preventDefault();
+        lock.logout();
+
+    });
+    </script>
+</body>
+
+</html>
