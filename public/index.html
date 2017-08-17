@@ -37,6 +37,7 @@
             </div>
         </main>
         <h2>Welcome <span id="nick" class="nickname"></span></h2>
+        <img class="user-avatar" src="" alt="">
     </div>
     <script src="https://cdn.auth0.com/js/lock/10.19/lock.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
@@ -69,6 +70,7 @@
         //TO DO: add checkbox newsletter field (need to choose more than one)
         //TO DO: add username field
         //TO DO: can I make optional fields (like gender)?
+        //TO DO: add helpers
 
     };
 
@@ -112,6 +114,7 @@
             }
 
             document.getElementById('nick').textContent = profile.nickname;
+            $('.user-avatar').attr('src', profile.picture);
 
 
             // Save token and profile locally
@@ -127,10 +130,10 @@
     $('#btn-login').click(function(e) {
         e.preventDefault();
         lock.show(
-        // {
-        //     callbackURL: 'http://localhost:3000',
-        //     responseType: 'token'
-        // }
+            // {
+            //     callbackURL: 'http://localhost:3000',
+            //     responseType: 'token'
+            // }
         );
 
     });
