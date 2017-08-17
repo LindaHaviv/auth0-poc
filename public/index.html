@@ -38,108 +38,99 @@
         </main>
         <h2>Welcome <span id="nick" class="nickname"></span></h2>
     </div>
-    <script src="https://cdn.auth0.com/js/lock/10.19/lock.min.js"></script>
+    <script src="https://cdn.auth0.com/js/auth0/8.8/auth0.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script>
-    var options = {
-        theme: {
-            logo: "https://vignette2.wikia.nocookie.net/logopedia/images/0/0b/Fox_News_Channel.svg.png/revision/latest?cb=20121107232621",
-            primaryColor: "#0000FF"
-        },
-        loginAfterSignUp: false,
-        additionalSignUpFields: [{
-                type: "select",
-                name: "party",
-                placeholder: "choose your party",
-                options: [
-                    { value: "republican", label: "Republican" },
-                    { value: "democrat", label: "Democrat" },
-                    { value: "independent", label: "independent" }
-                ]
-                // The following properties are optional
-                // icon: "https://cdn0.iconfinder.com/data/icons/thin-voting-awards/24/thin-0665_vote_ticket_paper_voting-512.png"
-            },
-            {
-                type: "checkbox",
-                name: "permissions",
-                //TO DO: make this linkable to: http://www.foxnews.com/about/privacy-policy/ && http://www.foxnews.com/story/2010/05/10/fox-news-network-llc-terms-use-agreement.html
-                placeholder: "I have read and agree to Fox News Digital's Terms of Service and Privacy Policy"
-            }
-        ]
-        //TO DO: add checkbox newsletter field (need to choose more than one)
-        //TO DO: add username field
-        //TO DO: can I make optional fields (like gender)?
-
-    };
 
     // Initiating our Auth0Lock
-    var lock = new Auth0Lock(
-        'F6Fg1rAPo4r9pzG6jSfQ2mjlnFArvRi3',
-        'lindahaviv.auth0.com',
-        options
-    );
 
-    // var hash = lock.parseHash(window.location.hash);
-
-    // if(hash){
-    //     if(hash.error){
-    //         console.log('error logging in.');
-    //         return;
-    //     }
-    //     if (hash.id_token){
-    //         lock.getProfile(hash.id_token, function(err,profile){
-    //             if(err){
-    //                 console.log('error fetching profile!', err);
-    //                 return;
-    //             }
-    //             $('#btn-login').hide();
-    //             $('#btn-logout').show();
-    //         });
-    //     }
-    // }
-
-    // Listening for the authenticated event
-    lock.on("authenticated", function(authResult) {
-
-        // Use the token in authResult to getUserInfo() and save it to localStorage
-        lock.getUserInfo(authResult.accessToken, function(error, profile) {
-            if (error) {
-                // Handle error
-                console.log(error);
-                return;
-            } else {
-                console.log(profile);
-            }
-
-            document.getElementById('nick').textContent = profile.nickname;
-
-
-            // Save token and profile locally
-
-            localStorage.setItem('accessToken', authResult.accessToken);
-            localStorage.setItem('profile', JSON.stringify(profile));
-
-
-            // Update DOM
-        });
+    var webAuth = new auth0.WebAuth({
+        domain: 'lindahaviv.auth0.com',
+        clientID: 'F6Fg1rAPo4r9pzG6jSfQ2mjlnFArvRi3',
+        redirectUri: 'http://localhost:3000',
+        responseType: 'token id_token',
+        scope: 'openid email nickname'
     });
 
     $('#btn-login').click(function(e) {
         e.preventDefault();
-        lock.show(
-        // {
-        //     callbackURL: 'http://localhost:3000',
-        //     responseType: 'token'
-        // }
-        );
+        webAuth.authorize();
 
     });
 
-    $('#btn-logout').click(function(e) {
-        e.preventDefault();
-        lock.logout();
+    //ask webAuth to pass hash
+    webAuth.parseHash({ hash: window.location.hash }, function(err, authResult) {
+        if (err) {
+            return console.log(err);
+        }
 
+        if (authResult && authResult.accessToken) {
+            webAuth.client.userInfo(authResult.accessToken, function(err, profile) {
+
+                // Now you have the user's information
+                if (err) {
+                    // Handle error
+                    console.log(err);
+                    return;
+                } else {
+                    console.log(profile);
+                }
+                document.getElementById('nick').textContent = profile.nickname;
+
+                localStorage.setItem('accessToken', authResult.accessToken);
+                localStorage.setItem('profile', JSON.stringify(profile));
+            });
+
+
+
+        }
     });
+
+
+    // // Listening for the authenticated event
+    // lock.on("authenticated", function(authResult) {
+    //     //hide module post auth
+    //     lock.hide();
+
+    //     // Use the token in authResult to getUserInfo() and save it to localStorage
+    //     lock.getUserInfo(authResult.accessToken, function(error, profile) {
+    //         if (error) {
+    //             // Handle error
+    //             console.log(error);
+    //             return;
+    //         } else {
+    //             console.log(profile);
+    //         }
+
+    //         document.getElementById('nick').textContent = profile.nickname;
+
+
+    //         // Save token and profile locally
+
+    //         localStorage.setItem('accessToken', authResult.accessToken);
+    //         localStorage.setItem('profile', JSON.stringify(profile));
+
+
+    //         // Update DOM
+    //     });
+    // });
+
+    // $('#btn-login').click(function(e) {
+    //     e.preventDefault();
+    //     lock.show(
+    //         // {
+    //         //     callbackURL: 'http://localhost:3000',
+    //         //     responseType: 'token'
+    //         // }
+    //     );
+
+    // });
+
+    // $('#btn-logout').click(function(e) {
+    //     e.preventDefault();
+    //     lock.logout();
+
+    // });
     </script>
 </body>
 
