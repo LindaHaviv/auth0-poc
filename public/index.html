@@ -47,7 +47,7 @@
     var webAuth = new auth0.WebAuth({
         domain: 'lindahaviv.auth0.com',
         clientID: 'F6Fg1rAPo4r9pzG6jSfQ2mjlnFArvRi3',
-        redirectUri: 'http://localhost:3000',
+        redirectUri: window.location.href,
         responseType: 'token id_token',
         scope: 'openid email nickname'
     });
